@@ -1,0 +1,99 @@
+{
+  "name": "github_test",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "owner": "hanna-sonnenberg",
+        "repository": "",
+        "events": [
+          "pull_request"
+        ]
+      },
+      "name": "Github Trigger",
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        410,
+        300
+      ],
+      "webhookId": "9593436c-2a72-4d45-bda0-f0f1c7ef8a02",
+      "credentials": {
+        "githubOAuth2Api": "n8n_github"
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "738656253",
+        "text": "=new pull request created: {{$node[\"Github Trigger\"].json[\"body\"][\"pull_request\"][\"url\"]}}\ntitle: {{$node[\"Github Trigger\"].json[\"body\"][\"pull_request\"][\"title\"]}}",
+        "additionalFields": {}
+      },
+      "name": "Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        760,
+        280
+      ],
+      "credentials": {
+        "telegramApi": "telegram"
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Github Trigger\"].json[\"body\"][\"action\"]}}",
+              "value2": "opened"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        560,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Github Trigger": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "id": "1"
+}
